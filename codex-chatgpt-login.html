@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex 切换为 ChatGPT 官方登录操作指南 · hellowen</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0d1117;--text:#e6edf3;--muted:#8b949e;--line:#30363d;--green:#7ee787;--blue:#79c0ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#7ee7871f,transparent 27rem),var(--bg);color:var(--text);font:16px/1.8 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}.shell{width:min(820px,calc(100% - 34px));margin:auto}.topbar{padding:28px 0;border-bottom:1px solid var(--line)}.topbar a{color:var(--green);text-decoration:none;font-weight:700}article{padding:54px 0 80px}.eyebrow{color:var(--green);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}h1{font-size:clamp(2rem,6vw,3.5rem);line-height:1.15;letter-spacing:-.04em}h2{margin:48px 0 14px;padding-top:24px;border-top:1px solid var(--line);font-size:1.55rem}h3{margin-top:30px;font-size:1.16rem}p,li{color:#c9d1d9}blockquote{margin:26px 0;padding:16px 20px;border-left:3px solid var(--green);background:#7ee78712}code{padding:.15em .35em;border-radius:6px;background:#6e768140;color:#d2a8ff}pre{overflow:auto;padding:18px;border:1px solid var(--line);border-radius:14px;background:#010409}pre code{padding:0;background:none;color:var(--text)}a{color:var(--blue)}.back{display:inline-block;margin-top:42px;color:var(--green);text-decoration:none}.refs{padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:#161b22cc}
+  </style>
+</head>
+<body><div class="shell"><div class="topbar"><a href="./">← hellowen / notes</a></div><article>
+  <div class="eyebrow">Codex · 配置 / 排障</div>
+  <h1>Codex 切换为 ChatGPT 官方登录操作指南</h1>
+  <p>本文记录一次从 DeepSeek API Key 登录切换回 ChatGPT 官方账号登录的排查与处理流程。</p>
+  <blockquote>Codex 的配置项、桌面端界面和可用模型会随版本变化。文中的模型名称仅作示例，请以当前客户端实际显示结果为准。</blockquote>
+  <h2>一、问题描述</h2>
+  <p>如果终端提示登录成功，但桌面端“选择模型”下拉框仍显示 DeepSeek 相关模型，常见原因是本地配置仍指定了 DeepSeek 提供商或模型，用户目录中残留 <code>models.json</code>，或者桌面端没有完全退出。</p>
+  <p>官方配置参考说明：用户级配置位于 <code>~/.codex/config.toml</code>，<code>forced_login_method</code> 可设置为 <code>chatgpt</code> 或 <code>api</code>。</p>
+  <h2>二、操作前的安全检查</h2>
+  <h3>1. 处理旧凭证</h3>
+  <ol><li>前往 DeepSeek 开发者后台，永久删除或废弃旧 API Key。</li><li>检查近期用量和账单，确认没有异常调用。</li><li>不要把 API Key、访问令牌或包含凭证的配置文件提交到 GitHub。</li></ol>
+  <h3>2. 备份配置文件</h3>
+  <p>修改前先备份 <code>C:\Users\wswwwynl\.codex\config.toml</code>。如果 Windows 用户名或 Codex 数据目录不同，请替换为实际路径。</p>
+  <h2>三、具体操作步骤</h2>
+  <h3>步骤 1：修改 <code>config.toml</code></h3>
+  <p>打开 <code>C:\Users\wswwwynl\.codex\config.toml</code>，删除或注释掉以下配置：</p>
+  <ul><li><code>model = "deepseek-v4-..."</code></li><li><code>model_provider = "deepseek"</code></li><li><code>preferred_auth_method = "apikey"</code></li><li><code>forced_login_method = "api"</code></li><li><code>model_catalog_json = "C:/Users/wswwwynl/.codex/models.json"</code></li></ul>
+  <p>然后添加：</p><pre><code>forced_login_method = "chatgpt"</code></pre>
+  <p>删除底部的自定义提供商区块：</p><pre><code>[model_providers.deepseek]
+# 以及该区块下的所有配置</code></pre>
+  <p>其中部分旧配置可能来自旧版本、第三方配置或个人定制。修改前务必保留备份，并以当前版本官方配置参考为准。</p>
+  <h3>步骤 2：清理自定义模型文件</h3>
+  <p>进入 <code>C:\Users\wswwwynl\.codex\</code>，找到 <code>models.json</code>，删除或重命名为 <code>models.json.bak</code>。如果文件不存在，可以继续。</p>
+  <h3>步骤 3：使用绝对路径重新登录</h3>
+  <p>打开 PowerShell，将路径替换为本机实际的 Codex 可执行文件路径：</p>
+  <pre><code># 1. 登出当前账号
+&amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" logout
+
+# 2. 发起 ChatGPT 官方登录
+&amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" login</code></pre>
+  <p>使用目标 ChatGPT 账号完成浏览器授权，终端出现 <code>Successfully logged in</code> 后继续。如果当前 CLI 支持登录状态检查，也可以执行：</p>
+  <pre><code>&amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" login status</code></pre>
+  <h3>步骤 4：彻底重启桌面端</h3>
+  <ol><li>关闭 Codex 桌面端窗口。</li><li>按 <code>Ctrl + Shift + Esc</code> 打开任务管理器。</li><li>结束仍在运行的 Codex、Electron 或相关 Codex 进程。</li><li>重新从开始菜单启动 Codex。</li></ol>
+  <h2>四、验证结果</h2>
+  <ol><li>点击“选择模型”下拉框。</li><li>确认 DeepSeek 选项已经消失。</li><li>确认列表显示当前账号和客户端可用的 OpenAI 官方模型。</li><li>如果仍有残留，进入 Settings 手动选择官方模型后重启一次应用。</li></ol>
+  <p>模型名称和可用范围可能因账号、地区、产品版本和工作区策略不同而变化，不要把某一组模型名称当作固定验证标准。</p>
+  <h2>五、仍未解决时的排查顺序</h2>
+  <ol><li><code>config.toml</code> 中是否仍存在 <code>model_provider = "deepseek"</code>。</li><li>是否仍然指定了 DeepSeek 模型。</li><li><code>[model_providers.deepseek]</code> 区块是否已删除。</li><li><code>models.json</code> 是否仍然存在。</li><li>是否真的结束了 Codex 桌面端相关进程。</li><li>PowerShell 使用的是否是实际正在运行的 Codex 可执行文件。</li><li>当前登录的是否为目标 ChatGPT 账号。</li><li>是否有组织或设备策略限制可用的登录方式或模型。</li></ol>
+  <h2>六、参考资料</h2><div class="refs"><ul><li><a href="https://learn.chatgpt.com/docs/config-file/config-reference">OpenAI Codex 配置参考</a></li><li><a href="https://developers.openai.com/learn/codex">OpenAI Codex 官方文档</a></li><li><a href="https://github.com/morethanmin/morethan-log">morethan-log 主题仓库</a></li></ul></div>
+  <a class="back" href="./">返回首页</a>
+</article></div></body></html>
+
