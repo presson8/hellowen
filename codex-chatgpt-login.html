@@ -92,10 +92,26 @@
       font-size: .92em;
     }
     .note-card pre {
-      overflow: auto; margin: 16px 0; padding: 16px 18px; border: 1px solid var(--line);
-      border-radius: 12px; background: var(--surface-soft);
+      position: relative; overflow: auto; margin: 16px 0; padding: 48px 18px 16px;
+      border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft);
     }
     .note-card pre code { padding: 0; background: transparent; color: var(--text); }
+    .copy-button {
+      position: absolute; top: 10px; right: 10px; display: inline-grid; place-items: center;
+      width: 32px; height: 32px; padding: 0; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--surface); color: var(--muted); cursor: pointer;
+      transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .copy-button:hover, .copy-button[data-copied="true"] {
+      border-color: var(--accent); color: var(--accent); background: var(--accent-soft);
+    }
+    .copy-button svg { width: 17px; height: 17px; }
+    .copy-message {
+      position: absolute; top: 16px; right: 50px; color: var(--accent);
+      font-size: .78rem; opacity: 0; transform: translateY(-2px);
+      pointer-events: none; transition: opacity .2s ease, transform .2s ease;
+    }
+    .copy-message.show { opacity: 1; transform: translateY(0); }
     .note-card a { color: var(--accent); text-underline-offset: 3px; }
     .refs { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
     .note-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 22px; color: var(--muted); }
@@ -233,6 +249,71 @@
   </div>
 
   <script>
+    function copyIcon() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1"></path></svg>';
+    }
+
+    function checkIcon() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>';
+    }
+
+    function fallbackCopy(text) {
+      var textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      var copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return copied ? Promise.resolve() : Promise.reject(new Error("copy failed"));
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      return fallbackCopy(text);
+    }
+
+    document.querySelectorAll(".note-card pre").forEach(function (pre) {
+      var button = document.createElement("button");
+      var message = document.createElement("span");
+      var timer;
+
+      button.type = "button";
+      button.className = "copy-button";
+      button.setAttribute("aria-label", "复制代码");
+      button.title = "复制代码";
+      button.innerHTML = copyIcon();
+
+      message.className = "copy-message";
+      message.textContent = "已复制";
+      pre.appendChild(button);
+      pre.appendChild(message);
+
+      button.addEventListener("click", function () {
+        var code = pre.querySelector("code");
+        copyText(code ? code.textContent : pre.textContent).then(function () {
+          window.clearTimeout(timer);
+          button.dataset.copied = "true";
+          button.innerHTML = checkIcon();
+          button.setAttribute("aria-label", "已复制");
+          button.title = "已复制";
+          message.classList.add("show");
+
+          timer = window.setTimeout(function () {
+            button.dataset.copied = "false";
+            button.innerHTML = copyIcon();
+            button.setAttribute("aria-label", "复制代码");
+            button.title = "复制代码";
+            message.classList.remove("show");
+          }, 2000);
+        });
+      });
+    });
+
     (function () {
       var root = document.documentElement;
       var button = document.getElementById("theme-toggle");
