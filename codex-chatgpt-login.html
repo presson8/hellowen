@@ -3,51 +3,255 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Codex 切换为 ChatGPT 官方登录操作指南">
   <title>Codex 切换为 ChatGPT 官方登录操作指南 · hellowen</title>
   <style>
-    :root{color-scheme:dark;--bg:#0d1117;--text:#e6edf3;--muted:#8b949e;--line:#30363d;--green:#7ee787;--blue:#79c0ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#7ee7871f,transparent 27rem),var(--bg);color:var(--text);font:16px/1.8 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}.shell{width:min(820px,calc(100% - 34px));margin:auto}.topbar{padding:28px 0;border-bottom:1px solid var(--line)}.topbar a{color:var(--green);text-decoration:none;font-weight:700}article{padding:54px 0 80px}.eyebrow{color:var(--green);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}h1{font-size:clamp(2rem,6vw,3.5rem);line-height:1.15;letter-spacing:-.04em}h2{margin:48px 0 14px;padding-top:24px;border-top:1px solid var(--line);font-size:1.55rem}h3{margin-top:30px;font-size:1.16rem}p,li{color:#c9d1d9}blockquote{margin:26px 0;padding:16px 20px;border-left:3px solid var(--green);background:#7ee78712}code{padding:.15em .35em;border-radius:6px;background:#6e768140;color:#d2a8ff}pre{overflow:auto;padding:18px;border:1px solid var(--line);border-radius:14px;background:#010409}pre code{padding:0;background:none;color:var(--text)}a{color:var(--blue)}.back{display:inline-block;margin-top:42px;color:var(--green);text-decoration:none}.refs{padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:#161b22cc}
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --surface-soft: #f1f1ee;
+      --text: #202124;
+      --muted: #858585;
+      --line: #e8e8e3;
+      --accent: #5d6b58;
+      --accent-soft: #e7eee3;
+      --shadow: 0 16px 42px rgba(35, 38, 30, .07);
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #171717;
+      --surface: #202020;
+      --surface-soft: #292929;
+      --text: #ededed;
+      --muted: #a0a0a0;
+      --line: #353535;
+      --accent: #bdd5b8;
+      --accent-soft: #2e3b2b;
+      --shadow: 0 18px 42px rgba(0, 0, 0, .18);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.75 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+      transition: background .2s ease, color .2s ease;
+    }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    .site-shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 30px 0 18px; }
+    .logo { font-size: 1.35rem; font-weight: 800; letter-spacing: -.04em; text-decoration: none; }
+    .theme-button {
+      width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%;
+      background: var(--surface); color: var(--text); cursor: pointer;
+    }
+    .theme-button:hover { border-color: var(--accent); }
+    .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 76px; padding: 34px 0 64px; }
+    .sidebar { position: sticky; top: 24px; align-self: start; }
+    .sidebar-section { margin-bottom: 32px; }
+    .sidebar-heading {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+      color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .sidebar-link { display: block; padding: 5px 0; color: var(--text); text-decoration: none; }
+    .sidebar-link:hover, .sidebar-link.active { color: var(--accent); }
+    .profile { padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+    .profile-avatar { display: grid; place-items: center; width: 58px; height: 58px; margin-bottom: 14px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 1.45rem; font-weight: 800; }
+    .profile-name { margin: 0; font-size: 1.05rem; }
+    .profile-role { margin: 2px 0 10px; color: var(--muted); font-size: .86rem; }
+    .profile-bio { margin: 0; color: var(--muted); font-size: .88rem; }
+    .search { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; background: var(--surface); color: var(--text); }
+    .search:focus { border-color: var(--accent); }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag { padding: 4px 9px; border-radius: 999px; background: var(--surface-soft); color: var(--muted); font-size: .78rem; }
+    .tag.active { background: var(--accent-soft); color: var(--accent); }
+    .note-header { margin-bottom: 22px; }
+    .note-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .82rem; }
+    .note-category { color: var(--accent); font-weight: 700; }
+    .note-title { margin: 10px 0 12px; font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.18; letter-spacing: -.05em; }
+    .note-summary { max-width: 720px; margin: 0; color: var(--muted); font-size: 1rem; }
+    .note-card {
+      padding: 34px 36px; border: 1px solid var(--line); border-radius: 18px;
+      background: var(--surface); box-shadow: var(--shadow);
+    }
+    .note-card h2 { margin: 32px 0 12px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 1.35rem; line-height: 1.4; }
+    .note-card h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+    .note-card h3 { margin: 25px 0 8px; font-size: 1.05rem; }
+    .note-card p, .note-card li { color: var(--text); }
+    .note-card ul, .note-card ol { padding-left: 1.45rem; }
+    .note-card li { margin: 7px 0; }
+    .note-card blockquote {
+      margin: 0 0 24px; padding: 14px 18px; border-left: 3px solid var(--accent);
+      background: var(--accent-soft); color: var(--muted);
+    }
+    .note-card code {
+      padding: .15em .35em; border-radius: 6px; background: var(--surface-soft); color: var(--accent);
+      font-size: .92em;
+    }
+    .note-card pre {
+      overflow: auto; margin: 16px 0; padding: 16px 18px; border: 1px solid var(--line);
+      border-radius: 12px; background: var(--surface-soft);
+    }
+    .note-card pre code { padding: 0; background: transparent; color: var(--text); }
+    .note-card a { color: var(--accent); text-underline-offset: 3px; }
+    .refs { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+    .note-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 22px; color: var(--muted); }
+    .note-footer a { color: var(--accent); text-decoration: none; }
+    footer { padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+    .mobile-nav { display: none; }
+    @media (max-width: 760px) {
+      .site-shell { width: min(100% - 28px, 620px); }
+      .topbar { padding-top: 20px; }
+      .layout { display: block; padding-top: 12px; }
+      .sidebar { position: static; display: grid; gap: 18px; margin-bottom: 34px; }
+      .sidebar-section { margin: 0; }
+      .profile { display: grid; grid-template-columns: 58px 1fr; column-gap: 14px; }
+      .profile-avatar { grid-row: span 3; margin: 0; }
+      .profile-name, .profile-role, .profile-bio { grid-column: 2; }
+      .profile-name { align-self: end; }
+      .profile-role { margin: 0; }
+      .profile-bio { align-self: start; }
+      .mobile-nav { display: flex; gap: 18px; }
+      .mobile-nav a { color: var(--muted); text-decoration: none; }
+      .sidebar .sidebar-section:nth-of-type(1) { display: none; }
+      .note-card { padding: 24px 20px; }
+    }
   </style>
 </head>
-<body><div class="shell"><div class="topbar"><a href="./">← hellowen / notes</a></div><article>
-  <div class="eyebrow">Codex · 配置 / 排障</div>
-  <h1>Codex 切换为 ChatGPT 官方登录操作指南</h1>
-  <p>本文记录一次从 DeepSeek API Key 登录切换回 ChatGPT 官方账号登录的排查与处理流程。</p>
-  <blockquote>Codex 的配置项、桌面端界面和可用模型会随版本变化。文中的模型名称仅作示例，请以当前客户端实际显示结果为准。</blockquote>
-  <h2>一、问题描述</h2>
-  <p>如果终端提示登录成功，但桌面端“选择模型”下拉框仍显示 DeepSeek 相关模型，常见原因是本地配置仍指定了 DeepSeek 提供商或模型，用户目录中残留 <code>models.json</code>，或者桌面端没有完全退出。</p>
-  <p>官方配置参考说明：用户级配置位于 <code>~/.codex/config.toml</code>，<code>forced_login_method</code> 可设置为 <code>chatgpt</code> 或 <code>api</code>。</p>
-  <h2>二、操作前的安全检查</h2>
-  <h3>1. 处理旧凭证</h3>
-  <ol><li>前往 DeepSeek 开发者后台，永久删除或废弃旧 API Key。</li><li>检查近期用量和账单，确认没有异常调用。</li><li>不要把 API Key、访问令牌或包含凭证的配置文件提交到 GitHub。</li></ol>
-  <h3>2. 备份配置文件</h3>
-  <p>修改前先备份 <code>C:\Users\wswwwynl\.codex\config.toml</code>。如果 Windows 用户名或 Codex 数据目录不同，请替换为实际路径。</p>
-  <h2>三、具体操作步骤</h2>
-  <h3>步骤 1：修改 <code>config.toml</code></h3>
-  <p>打开 <code>C:\Users\wswwwynl\.codex\config.toml</code>，删除或注释掉以下配置：</p>
-  <ul><li><code>model = "deepseek-v4-..."</code></li><li><code>model_provider = "deepseek"</code></li><li><code>preferred_auth_method = "apikey"</code></li><li><code>forced_login_method = "api"</code></li><li><code>model_catalog_json = "C:/Users/wswwwynl/.codex/models.json"</code></li></ul>
-  <p>然后添加：</p><pre><code>forced_login_method = "chatgpt"</code></pre>
-  <p>删除底部的自定义提供商区块：</p><pre><code>[model_providers.deepseek]
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="logo" href="./">hellowen</a>
+      <button class="theme-button" id="theme-toggle" aria-label="切换主题">☾</button>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" aria-label="博客侧栏">
+        <div class="sidebar-section">
+          <div class="sidebar-heading">☰ Menu</div>
+          <a class="sidebar-link active" href="codex-chatgpt-login.html">About this note</a>
+          <a class="sidebar-link" href="./#posts">All posts</a>
+        </div>
+
+        <div class="sidebar-section profile">
+          <div class="profile-avatar" aria-hidden="true">H</div>
+          <h2 class="profile-name">hellowen</h2>
+          <div class="profile-role">notes keeper</div>
+          <p class="profile-bio">记录配置、开发与生活的温柔片段。</p>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-heading">⌕ Search</div>
+          <input class="search" type="search" placeholder="Search Keyword..." aria-label="搜索文章">
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-heading">🏷 Tags</div>
+          <div class="tags">
+            <span class="tag active">Codex</span>
+            <span class="tag">Config</span>
+            <span class="tag">Windows</span>
+            <span class="tag">GitHub Pages</span>
+          </div>
+        </div>
+
+        <nav class="mobile-nav" aria-label="页脚导航">
+          <a href="https://github.com/presson8/hellowen">GitHub</a>
+          <a href="https://github.com/morethanmin/morethan-log">Theme</a>
+        </nav>
+      </aside>
+
+      <main>
+        <header class="note-header">
+          <div class="note-meta"><span class="note-category">Docs</span><span>·</span><span>2026-09-24</span><span>·</span><span>Codex / Config</span></div>
+          <h1 class="note-title">Codex 切换为 ChatGPT 官方登录操作指南</h1>
+          <p class="note-summary">清理旧的 DeepSeek 配置、模型缓存与桌面端状态，恢复 ChatGPT 官方账号登录。</p>
+        </header>
+
+        <article class="note-card">
+          <blockquote>Codex 的配置项、桌面端界面和可用模型会随版本变化。文中的模型名称仅作示例，请以当前客户端实际显示结果为准。</blockquote>
+
+          <h2>一、问题描述</h2>
+          <p>如果终端提示登录成功，但桌面端“选择模型”下拉框仍显示 DeepSeek 相关模型，常见原因是本地配置仍指定了 DeepSeek 提供商或模型，用户目录中残留 <code>models.json</code>，或者桌面端没有完全退出。</p>
+          <p>官方配置参考说明：用户级配置位于 <code>~/.codex/config.toml</code>，<code>forced_login_method</code> 可设置为 <code>chatgpt</code> 或 <code>api</code>。</p>
+
+          <h2>二、操作前的安全检查</h2>
+          <h3>1. 处理旧凭证</h3>
+          <ol><li>前往 DeepSeek 开发者后台，永久删除或废弃旧 API Key。</li><li>检查近期用量和账单，确认没有异常调用。</li><li>不要把 API Key、访问令牌或包含凭证的配置文件提交到 GitHub。</li></ol>
+          <h3>2. 备份配置文件</h3>
+          <p>修改前先备份 <code>C:\Users\wswwwynl\.codex\config.toml</code>。如果 Windows 用户名或 Codex 数据目录不同，请替换为实际路径。</p>
+
+          <h2>三、具体操作步骤</h2>
+          <h3>步骤 1：修改 <code>config.toml</code></h3>
+          <p>打开 <code>C:\Users\wswwwynl\.codex\config.toml</code>，删除或注释掉以下配置：</p>
+          <ul><li><code>model = "deepseek-v4-..."</code></li><li><code>model_provider = "deepseek"</code></li><li><code>preferred_auth_method = "apikey"</code></li><li><code>forced_login_method = "api"</code></li><li><code>model_catalog_json = "C:/Users/wswwwynl/.codex/models.json"</code></li></ul>
+          <p>然后添加：</p>
+          <pre><code>forced_login_method = "chatgpt"</code></pre>
+          <p>删除底部的自定义提供商区块：</p>
+          <pre><code>[model_providers.deepseek]
 # 以及该区块下的所有配置</code></pre>
-  <p>其中部分旧配置可能来自旧版本、第三方配置或个人定制。修改前务必保留备份，并以当前版本官方配置参考为准。</p>
-  <h3>步骤 2：清理自定义模型文件</h3>
-  <p>进入 <code>C:\Users\wswwwynl\.codex\</code>，找到 <code>models.json</code>，删除或重命名为 <code>models.json.bak</code>。如果文件不存在，可以继续。</p>
-  <h3>步骤 3：使用绝对路径重新登录</h3>
-  <p>打开 PowerShell，将路径替换为本机实际的 Codex 可执行文件路径：</p>
-  <pre><code># 1. 登出当前账号
+          <p>其中部分旧配置可能来自旧版本、第三方配置或个人定制。修改前务必保留备份，并以当前版本官方配置参考为准。</p>
+
+          <h3>步骤 2：清理自定义模型文件</h3>
+          <p>进入 <code>C:\Users\wswwwynl\.codex\</code>，找到 <code>models.json</code>，删除或重命名为 <code>models.json.bak</code>。如果文件不存在，可以继续。</p>
+
+          <h3>步骤 3：使用绝对路径重新登录</h3>
+          <p>打开 PowerShell，将路径替换为本机实际的 Codex 可执行文件路径：</p>
+          <pre><code># 1. 登出当前账号
 &amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" logout
 
 # 2. 发起 ChatGPT 官方登录
 &amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" login</code></pre>
-  <p>使用目标 ChatGPT 账号完成浏览器授权，终端出现 <code>Successfully logged in</code> 后继续。如果当前 CLI 支持登录状态检查，也可以执行：</p>
-  <pre><code>&amp; "C:\Users\wswwwynl\AppData\Local\OpenAI\Codex\bin\cdef5aaf3e41ab53\codex.exe" login status</code></pre>
-  <h3>步骤 4：彻底重启桌面端</h3>
-  <ol><li>关闭 Codex 桌面端窗口。</li><li>按 <code>Ctrl + Shift + Esc</code> 打开任务管理器。</li><li>结束仍在运行的 Codex、Electron 或相关 Codex 进程。</li><li>重新从开始菜单启动 Codex。</li></ol>
-  <h2>四、验证结果</h2>
-  <ol><li>点击“选择模型”下拉框。</li><li>确认 DeepSeek 选项已经消失。</li><li>确认列表显示当前账号和客户端可用的 OpenAI 官方模型。</li><li>如果仍有残留，进入 Settings 手动选择官方模型后重启一次应用。</li></ol>
-  <p>模型名称和可用范围可能因账号、地区、产品版本和工作区策略不同而变化，不要把某一组模型名称当作固定验证标准。</p>
-  <h2>五、仍未解决时的排查顺序</h2>
-  <ol><li><code>config.toml</code> 中是否仍存在 <code>model_provider = "deepseek"</code>。</li><li>是否仍然指定了 DeepSeek 模型。</li><li><code>[model_providers.deepseek]</code> 区块是否已删除。</li><li><code>models.json</code> 是否仍然存在。</li><li>是否真的结束了 Codex 桌面端相关进程。</li><li>PowerShell 使用的是否是实际正在运行的 Codex 可执行文件。</li><li>当前登录的是否为目标 ChatGPT 账号。</li><li>是否有组织或设备策略限制可用的登录方式或模型。</li></ol>
-  <h2>六、参考资料</h2><div class="refs"><ul><li><a href="https://learn.chatgpt.com/docs/config-file/config-reference">OpenAI Codex 配置参考</a></li><li><a href="https://developers.openai.com/learn/codex">OpenAI Codex 官方文档</a></li><li><a href="https://github.com/morethanmin/morethan-log">morethan-log 主题仓库</a></li></ul></div>
-  <a class="back" href="./">返回首页</a>
-</article></div></body></html>
+          <p>使用目标 ChatGPT 账号完成浏览器授权，终端出现 <code>Successfully logged in</code> 后继续。</p>
 
+          <h3>步骤 4：彻底重启桌面端</h3>
+          <ol><li>关闭 Codex 桌面端窗口。</li><li>按 <code>Ctrl + Shift + Esc</code> 打开任务管理器。</li><li>结束仍在运行的 Codex、Electron 或相关 Codex 进程。</li><li>重新从开始菜单启动 Codex。</li></ol>
+
+          <h2>四、验证结果</h2>
+          <ol><li>点击“选择模型”下拉框。</li><li>确认 DeepSeek 选项已经消失。</li><li>确认列表显示当前账号和当前客户端可用的 OpenAI 官方模型。</li><li>如果仍有残留，进入 Settings 手动选择官方模型后重启一次应用。</li></ol>
+          <p>模型名称和可用范围可能因账号、地区、产品版本和工作区策略不同而变化，不要把某一组模型名称当作固定验证标准。</p>
+
+          <h2>五、仍未解决时的排查顺序</h2>
+          <ol><li><code>config.toml</code> 中是否仍存在 <code>model_provider = "deepseek"</code>。</li><li>是否仍然指定了 DeepSeek 模型。</li><li><code>[model_providers.deepseek]</code> 区块是否已删除。</li><li><code>models.json</code> 是否仍然存在。</li><li>是否真的结束了 Codex 桌面端相关进程。</li><li>PowerShell 使用的是否是实际正在运行的 Codex 可执行文件。</li><li>当前登录的是否为目标 ChatGPT 账号。</li><li>是否有组织或设备策略限制可用的登录方式或模型。</li></ol>
+
+          <h2>六、参考资料</h2>
+          <div class="refs"><ul><li><a href="https://learn.chatgpt.com/docs/config-file/config-reference">OpenAI Codex 配置参考</a></li><li><a href="https://developers.openai.com/learn/codex">OpenAI Codex 官方文档</a></li><li><a href="https://github.com/morethanmin/morethan-log">morethan-log 主题仓库</a></li></ul></div>
+
+          <div class="note-footer"><a href="./">← 返回首页</a><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ 回到顶部</a></div>
+        </article>
+      </main>
+    </div>
+
+    <footer>
+      © hellowen · 视觉参考 <a href="https://github.com/morethanmin/morethan-log">morethan-log</a> ·
+      <a href="https://github.com/presson8/hellowen">Open Source on GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var button = document.getElementById("theme-toggle");
+      var saved = localStorage.getItem("hellowen-theme");
+      if (saved === "dark") root.setAttribute("data-theme", "dark");
+      button.textContent = root.getAttribute("data-theme") === "dark" ? "☀" : "☾";
+      button.addEventListener("click", function () {
+        var dark = root.getAttribute("data-theme") === "dark";
+        if (dark) {
+          root.removeAttribute("data-theme");
+          localStorage.setItem("hellowen-theme", "light");
+          button.textContent = "☾";
+        } else {
+          root.setAttribute("data-theme", "dark");
+          localStorage.setItem("hellowen-theme", "dark");
+          button.textContent = "☀";
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
