@@ -4,214 +4,135 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="hellowen · 一个记录配置、开发与生活的中文博客">
-  <title>hellowen</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f7f7f5;
-      --surface: #ffffff;
-      --surface-soft: #f1f1ee;
-      --text: #202124;
-      --muted: #858585;
-      --line: #e8e8e3;
-      --accent: #5d6b58;
-      --accent-soft: #e7eee3;
-      --shadow: 0 16px 42px rgba(35, 38, 30, .07);
-    }
-    [data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #171717;
-      --surface: #202020;
-      --surface-soft: #292929;
-      --text: #ededed;
-      --muted: #a0a0a0;
-      --line: #353535;
-      --accent: #bdd5b8;
-      --accent-soft: #2e3b2b;
-      --shadow: 0 18px 42px rgba(0, 0, 0, .18);
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font: 14px/1.75 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
-      transition: background .2s ease, color .2s ease;
-    }
-    a { color: inherit; }
-    button, input { font: inherit; }
-    .site-shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 30px 0 18px; }
-    .logo { font-size: 1.35rem; font-weight: 800; letter-spacing: -.04em; text-decoration: none; }
-    .theme-button {
-      width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%;
-      background: var(--surface); color: var(--text); cursor: pointer;
-    }
-    .theme-button:hover { border-color: var(--accent); }
-    .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 76px; padding: 34px 0 64px; }
-    .sidebar { position: sticky; top: 24px; align-self: start; }
-    .sidebar-section { margin-bottom: 32px; }
-    .sidebar-heading {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
-      color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-    }
-    .sidebar-link { display: block; padding: 5px 0; color: var(--text); text-decoration: none; }
-    .sidebar-link:hover { color: var(--accent); }
-    .profile { padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
-    .profile-avatar { display: grid; place-items: center; width: 58px; height: 58px; margin-bottom: 14px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 1.45rem; font-weight: 800; }
-    .profile-name { margin: 0; font-size: 1.05rem; }
-    .profile-role { margin: 2px 0 10px; color: var(--muted); font-size: .86rem; }
-    .profile-bio { margin: 0; color: var(--muted); font-size: .88rem; }
-    .search { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; background: var(--surface); color: var(--text); }
-    .search:focus { border-color: var(--accent); }
-    .tags { display: flex; flex-wrap: wrap; gap: 7px; }
-    .tag { padding: 4px 9px; border-radius: 999px; background: var(--surface-soft); color: var(--muted); font-size: .78rem; }
-    .tag.active { background: var(--accent-soft); color: var(--accent); }
-    .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-    .content-title { margin: 0; font-size: 1.55rem; letter-spacing: -.035em; }
-    .sort { display: flex; gap: 8px; color: var(--muted); font-size: .82rem; }
-    .sort button { padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
-    .sort button.active, .sort button:hover { color: var(--text); }
-    .posts { display: grid; gap: 14px; }
-    .post {
-      display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 17px;
-      padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
-      text-decoration: none; box-shadow: 0 4px 16px rgba(0, 0, 0, .025);
-      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-    }
-    .post:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow); }
-    .post-icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 15px; background: var(--accent-soft); font-size: 1.5rem; }
-    .post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .78rem; }
-    .post-category { color: var(--accent); font-weight: 700; }
-    .post h2 { margin: 5px 0 4px; font-size: 1.1rem; line-height: 1.4; }
-    .post-excerpt { margin: 0; color: var(--muted); font-size: .88rem; }
-    .post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-    .post-tags span { color: var(--muted); font-size: .75rem; }
-    footer { padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
-    footer a { color: var(--accent); text-decoration: none; }
-    .mobile-nav { display: none; }
-    @media (max-width: 760px) {
-      .site-shell { width: min(100% - 28px, 620px); }
-      .topbar { padding-top: 20px; }
-      .layout { display: block; padding-top: 12px; }
-      .sidebar { position: static; display: grid; gap: 18px; margin-bottom: 34px; }
-      .sidebar-section { margin: 0; }
-      .profile { display: grid; grid-template-columns: 58px 1fr; column-gap: 14px; }
-      .profile-avatar { grid-row: span 3; margin: 0; }
-      .profile-name, .profile-role, .profile-bio { grid-column: 2; }
-      .profile-name { align-self: end; }
-      .profile-role { margin: 0; }
-      .profile-bio { align-self: start; }
-      .mobile-nav { display: flex; gap: 18px; }
-      .mobile-nav a { color: var(--muted); text-decoration: none; }
-      .sidebar .sidebar-section:nth-of-type(1) { display: none; }
-    }
-    @media (max-width: 480px) {
-      .content-header { align-items: flex-start; gap: 12px; }
-      .content-title { font-size: 1.3rem; }
-      .post { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 15px; }
-      .post-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem; }
-    }
-  </style>
+  <title>Hellowen</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="site-shell">
-    <header class="topbar">
-      <a class="logo" href="./">hellowen</a>
-      <button class="theme-button" id="theme-toggle" aria-label="切换主题">☾</button>
-    </header>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="./">Hellowen</a>
+      <div class="header-actions">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换主题">☾</button>
+      </div>
+    </div>
+  </header>
 
-    <div class="layout">
-      <aside class="sidebar" aria-label="博客侧栏">
-        <div class="sidebar-section">
-          <div class="sidebar-heading">☰ Menu</div>
-          <a class="sidebar-link" href="codex-chatgpt-login.html">About this note</a>
-          <a class="sidebar-link" href="#posts">All posts</a>
-        </div>
-
-        <div class="sidebar-section profile">
-          <div class="profile-avatar" aria-hidden="true">H</div>
-          <h2 class="profile-name">hellowen</h2>
-          <div class="profile-role">notes keeper</div>
-          <p class="profile-bio">记录配置、开发与生活的温柔片段。</p>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-heading">⌕ Search</div>
-          <input class="search" id="search" type="search" placeholder="Search Keyword..." aria-label="搜索文章">
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-heading">🏷 Tags</div>
-          <div class="tags">
-            <span class="tag active">Codex</span>
-            <span class="tag">Config</span>
-            <span class="tag">Windows</span>
-            <span class="tag">GitHub Pages</span>
-          </div>
-        </div>
-
-        <nav class="mobile-nav" aria-label="页脚导航">
-          <a href="https://github.com/presson8/hellowen">GitHub</a>
-          <a href="https://github.com/morethanmin/morethan-log">Theme</a>
+  <main class="site-main">
+    <div class="page-grid">
+      <aside class="left-column" aria-label="文章标签">
+        <div class="column-title">🏷️ Tags</div>
+        <nav class="tag-list">
+          <a class="active" href="#posts">All</a>
+          <a href="#posts">Codex</a>
+          <a href="#posts">Config</a>
+          <a href="#posts">Windows</a>
         </nav>
       </aside>
 
-      <main id="posts">
-        <div class="content-header">
-          <h1 class="content-title">📂 All Posts</h1>
-          <div class="sort" aria-label="排序">
+      <section class="main-column" id="posts">
+        <div class="mobile-profile">
+          <div class="column-title">💻 Profile</div>
+          <div class="profile-card">
+            <img class="profile-image" src="avatar.svg" alt="Presson8">
+            <div class="profile-info">
+              <div class="profile-name">Presson8</div>
+              <div class="profile-role">学习与生活记录</div>
+              <p class="profile-bio">记录配置、开发与生活的温柔片段。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-box">
+          <div class="search-label">🔎 Search</div>
+          <input class="search-input" id="search-input" type="search" placeholder="Search Keyword..." aria-label="搜索文章">
+        </div>
+
+        <div class="feed-header">
+          <h1 class="feed-title">All Posts</h1>
+          <div class="order-links">
             <button class="active" type="button">Desc</button>
-            <span>·</span>
             <button type="button">Asc</button>
           </div>
         </div>
 
-        <section class="posts" aria-label="文章列表">
-          <a class="post" href="codex-chatgpt-login.html" data-search="codex chatgpt deepseek login config windows">
-            <div class="post-icon" aria-hidden="true">📗</div>
-            <div>
-              <div class="post-meta"><span class="post-category">Docs</span><span>·</span><span>2026-09-24</span></div>
-              <h2>Codex 切换为 ChatGPT 官方登录操作指南</h2>
-              <p class="post-excerpt">清理旧的 DeepSeek 配置、模型缓存与桌面端状态，恢复 ChatGPT 官方账号登录。</p>
-              <div class="post-tags"><span># Codex</span><span># Config</span><span># Windows</span></div>
-            </div>
+        <div id="post-list">
+          <a class="post-card" href="codex-chatgpt-login.html" data-search="codex chatgpt deepseek config windows login">
+            <article class="post-content">
+              <div class="category">Docs</div>
+              <h2 class="post-title">Codex 切换为 ChatGPT 官方登录操作指南</h2>
+              <div class="post-date">Sep 24, 2026</div>
+              <p class="post-summary">清理旧的 DeepSeek 配置、模型缓存与桌面端状态，恢复 ChatGPT 官方账号登录。</p>
+              <div class="tags">
+                <span class="tag-pill">Codex</span>
+                <span class="tag-pill">ChatGPT</span>
+                <span class="tag-pill">Config</span>
+              </div>
+            </article>
           </a>
-        </section>
-      </main>
-    </div>
+        </div>
 
-    <footer>
-      © hellowen · 视觉参考 <a href="https://github.com/morethanmin/morethan-log">morethan-log</a> ·
-      <a href="https://github.com/presson8/hellowen">Open Source on GitHub</a>
-    </footer>
-  </div>
+        <footer class="site-footer">
+          <a href="https://github.com/presson8/hellowen" target="_blank" rel="noreferrer">© Presson8 2026</a>
+        </footer>
+      </section>
+
+      <aside class="right-column" aria-label="个人信息">
+        <div class="column-title">💻 Profile</div>
+        <div class="profile-card">
+          <img class="profile-image" src="avatar.svg" alt="Presson8">
+          <div class="profile-info">
+            <div class="profile-name">Presson8</div>
+            <div class="profile-role">学习与生活记录</div>
+            <p class="profile-bio">记录配置、开发与生活的温柔片段。</p>
+          </div>
+        </div>
+
+        <div class="side-title">🌟 Service</div>
+        <nav class="side-list">
+          <a href="https://github.com/presson8/hellowen" target="_blank" rel="noreferrer">
+            <span class="side-icon">⌘</span><span>hellowen</span>
+          </a>
+        </nav>
+
+        <div class="side-title">💬 Contact</div>
+        <nav class="side-list">
+          <a href="https://github.com/presson8" target="_blank" rel="noreferrer">
+            <span class="side-icon">⌘</span><span>github</span>
+          </a>
+        </nav>
+
+        <footer class="site-footer">
+          <a href="https://github.com/presson8/hellowen" target="_blank" rel="noreferrer">© Presson8 2026</a>
+        </footer>
+      </aside>
+    </div>
+  </main>
 
   <script>
     (function () {
       var root = document.documentElement;
-      var button = document.getElementById("theme-toggle");
+      var toggle = document.getElementById("theme-toggle");
       var saved = localStorage.getItem("hellowen-theme");
-      if (saved === "dark") root.setAttribute("data-theme", "dark");
-      button.textContent = root.getAttribute("data-theme") === "dark" ? "☀" : "☾";
-      button.addEventListener("click", function () {
-        var dark = root.getAttribute("data-theme") === "dark";
+      if (saved === "dark") root.dataset.theme = "dark";
+      toggle.textContent = root.dataset.theme === "dark" ? "☀" : "☾";
+      toggle.addEventListener("click", function () {
+        var dark = root.dataset.theme === "dark";
         if (dark) {
           root.removeAttribute("data-theme");
           localStorage.setItem("hellowen-theme", "light");
-          button.textContent = "☾";
+          toggle.textContent = "☾";
         } else {
-          root.setAttribute("data-theme", "dark");
+          root.dataset.theme = "dark";
           localStorage.setItem("hellowen-theme", "dark");
-          button.textContent = "☀";
+          toggle.textContent = "☀";
         }
       });
-      var search = document.getElementById("search");
-      var post = document.querySelector(".post");
+
+      var search = document.getElementById("search-input");
+      var post = document.querySelector(".post-card");
       search.addEventListener("input", function () {
         var keyword = search.value.trim().toLowerCase();
-        post.style.display = !keyword || post.dataset.search.indexOf(keyword) >= 0 ? "grid" : "none";
+        post.style.display = !keyword || post.dataset.search.indexOf(keyword) >= 0 ? "block" : "none";
       });
     }());
   </script>
