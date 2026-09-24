@@ -92,26 +92,39 @@
       font-size: .92em;
     }
     .note-card pre {
-      position: relative; overflow: auto; margin: 16px 0; padding: 48px 18px 16px;
-      border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft);
+      position: relative; display: block; overflow: auto; width: 100%; margin: 4px 0;
+      padding: 1em; border: 0; border-radius: 8px; background: var(--surface-soft);
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      line-height: 1.55; tab-size: 2;
     }
     .note-card pre code { padding: 0; background: transparent; color: var(--text); }
+    .copy-area {
+      position: absolute; top: 1em; right: 1em; z-index: 9; user-select: none;
+      opacity: 0; transition: opacity .2s cubic-bezier(.3, 0, .5, 1);
+    }
+    .note-card pre:hover .copy-area { opacity: 1; }
     .copy-button {
-      position: absolute; top: 10px; right: 10px; display: inline-grid; place-items: center;
-      width: 32px; height: 32px; padding: 0; border: 1px solid var(--line);
-      border-radius: 8px; background: var(--surface); color: var(--muted); cursor: pointer;
-      transition: color .2s ease, border-color .2s ease, background .2s ease;
+      display: inline-block; padding: .6em; border: 1px solid rgba(27, 31, 36, .15);
+      border-radius: 6px; background: #f6f8fa; color: #24292f; cursor: pointer;
+      font-size: 1.25em; line-height: 1em;
+      box-shadow: 0 1px 0 rgba(27, 31, 36, .04), inset 0 1px 0 rgba(255, 255, 255, .25);
+      transition: background-color .2s cubic-bezier(.3, 0, .5, 1), color .2s cubic-bezier(.3, 0, .5, 1), border-color .2s cubic-bezier(.3, 0, .5, 1);
     }
     .copy-button:hover, .copy-button[data-copied="true"] {
-      border-color: var(--accent); color: var(--accent); background: var(--accent-soft);
+      background: #f3f4f6; border-color: rgba(27, 31, 36, .15); color: #24292f;
     }
-    .copy-button svg { width: 17px; height: 17px; }
+    .copy-button:active { background: #e5e7eb; border-color: rgba(27, 31, 36, .15); }
+    .copy-button svg { display: block; width: 1em; height: 1em; }
     .copy-message {
-      position: absolute; top: 16px; right: 50px; color: var(--accent);
-      font-size: .78rem; opacity: 0; transform: translateY(-2px);
-      pointer-events: none; transition: opacity .2s ease, transform .2s ease;
+      position: absolute; bottom: -38px; left: 50%; z-index: 99; width: max-content;
+      padding: 6px 8px; border-radius: 6px; background: #222; color: #fff;
+      font-size: 14px; opacity: 0; pointer-events: none; transform: translateX(-50%);
+      transition: opacity .2s ease;
     }
-    .copy-message.show { opacity: 1; transform: translateY(0); }
+    .copy-message.show { opacity: 1; }
+    @media (max-width: 760px) {
+      .note-card pre .copy-area { opacity: 1; }
+    }
     .note-card a { color: var(--accent); text-underline-offset: 3px; }
     .refs { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
     .note-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 22px; color: var(--muted); }
@@ -278,10 +291,12 @@
     }
 
     document.querySelectorAll(".note-card pre").forEach(function (pre) {
+      var copyArea = document.createElement("div");
       var button = document.createElement("button");
       var message = document.createElement("span");
       var timer;
 
+      copyArea.className = "copy-area";
       button.type = "button";
       button.className = "copy-button";
       button.setAttribute("aria-label", "复制代码");
@@ -290,8 +305,9 @@
 
       message.className = "copy-message";
       message.textContent = "已复制";
-      pre.appendChild(button);
-      pre.appendChild(message);
+      copyArea.appendChild(button);
+      copyArea.appendChild(message);
+      pre.appendChild(copyArea);
 
       button.addEventListener("click", function () {
         var code = pre.querySelector("code");
